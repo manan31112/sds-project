@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .slide-down {
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .input-focus {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .input-focus:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+        }
+        
+        .strength-bar {
+            height: 3px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 2px;
+        }
+        
+        .checkbox-custom {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .checkbox-custom:checked {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+        }
+        
+        .checkbox-custom:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-gradient:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-gradient:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        .floating-label {
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        
+        .input-wrapper input:focus ~ .floating-label,
+        .input-wrapper input:not(:placeholder-shown) ~ .floating-label {
+            transform: translateY(-28px) scale(0.85);
+            color: #667eea;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="min-h-screen gradient-bg flex items-center justify-center p-4 relative overflow-hidden">
+    <!-- Decorative Elements -->
+    <div class="absolute top-0 left-0 w-72 h-72 bg-white opacity-5 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl"></div>
+    
+    <div class="w-full max-w-md relative z-10 fade-in">
+        <!-- Logo/Brand -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg mb-4">
+                <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-white mb-2">Create Account</h1>
+            <p class="text-purple-100 text-sm">Start your journey with us today</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="glass-effect rounded-3xl shadow-2xl p-8">
+            <form id="registrationForm" novalidate>
+                <input type="hidden" id="csrfToken" name="csrf_token" value="">
+
+                <!-- Username -->
+                <div class="mb-6">
+                    <div class="input-wrapper relative">
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username"
+                            required
+                            pattern="^[a-zA-Z0-9_]{3,20}$"
+                            maxlength="20"
+                            placeholder=" "
+                            class="input-focus w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none transition bg-white"
+                        >
+                        <label for="username" class="floating-label absolute left-4 top-3.5 text-gray-500 text-sm">Username</label>
+                    </div>
+                    <p class="mt-2 text-xs text-gray-500 ml-1">3-20 characters • Letters, numbers, underscores</p>
+                    <p id="usernameError" class="mt-1 text-sm text-red-500 ml-1 hidden slide-down"></p>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-6">
+                    <div class="input-wrapper relative">
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email"
+                            required
+                            maxlength="100"
+                            placeholder=" "
+                            class="input-focus w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none transition bg-white"
+                        >
+                        <label for="email" class="floating-label absolute left-4 top-3.5 text-gray-500 text-sm">Email Address</label>
+                    </div>
+                    <p id="emailError" class="mt-1 text-sm text-red-500 ml-1 hidden slide-down"></p>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-6">
+                    <div class="input-wrapper relative">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password"
+                            required
+                            minlength="8"
+                            maxlength="128"
+                            placeholder=" "
+                            class="input-focus w-full px-4 py-3.5 pr-12 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none transition bg-white"
+                        >
+                        <label for="password" class="floating-label absolute left-4 top-3.5 text-gray-500 text-sm">Password</label>
+                        <button 
+                            type="button" 
+                            id="togglePassword"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                        >
+                            <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Strength Meter -->
+                    <div class="mt-3">
+                        <div class="flex gap-1.5">
+                            <div class="strength-bar flex-1 bg-gray-200" id="strength1"></div>
+                            <div class="strength-bar flex-1 bg-gray-200" id="strength2"></div>
+                            <div class="strength-bar flex-1 bg-gray-200" id="strength3"></div>
+                            <div class="strength-bar flex-1 bg-gray-200" id="strength4"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 ml-1">
+                            Strength: <span id="strengthLabel" class="font-medium">Not set</span>
+                        </p>
+                    </div>
+
+                    <!-- Requirements -->
+                    <div class="mt-3 space-y-1.5">
+                        <div class="flex items-center gap-2 text-xs">
+                            <span id="check1" class="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center text-[10px]"></span>
+                            <span class="text-gray-600">8+ characters</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs">
+                            <span id="check2" class="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center text-[10px]"></span>
+                            <span class="text-gray-600">Upper & lowercase</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs">
+                            <span id="check3" class="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center text-[10px]"></span>
+                            <span class="text-gray-600">Number</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs">
+                            <span id="check4" class="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center text-[10px]"></span>
+                            <span class="text-gray-600">Special character</span>
+                        </div>
+                    </div>
+                    <p id="passwordError" class="mt-2 text-sm text-red-500 ml-1 hidden slide-down"></p>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-6">
+                    <div class="input-wrapper relative">
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirm_password"
+                            required
+                            placeholder=" "
+                            class="input-focus w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none transition bg-white"
+                        >
+                        <label for="confirmPassword" class="floating-label absolute left-4 top-3.5 text-gray-500 text-sm">Confirm Password</label>
+                    </div>
+                    <p id="confirmPasswordError" class="mt-1 text-sm text-red-500 ml-1 hidden slide-down"></p>
+                </div>
+
+                <!-- Terms -->
+                <div class="mb-6">
+                    <label class="flex items-start gap-3 cursor-pointer group">
+                        <input 
+                            type="checkbox" 
+                            id="terms" 
+                            name="terms"
+                            required
+                            class="checkbox-custom mt-0.5"
+                        >
+                        <span class="text-sm text-gray-600 leading-relaxed">
+                            I agree to the <a href="#" class="text-purple-600 hover:underline font-medium">Terms of Service</a> and <a href="#" class="text-purple-600 hover:underline font-medium">Privacy Policy</a>
+                        </span>
+                    </label>
+                    <p id="termsError" class="mt-1 text-sm text-red-500 ml-1 hidden slide-down"></p>
+                </div>
+
+                <!-- Submit Button -->
+                <button 
+                    type="submit" 
+                    id="submitBtn"
+                    class="btn-gradient w-full text-white font-semibold py-4 px-6 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+                >
+                    <span id="btnText">Create Account</span>
+                    <svg id="btnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                    <svg id="spinner" class="w-5 h-5 animate-spin hidden" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+
+                <!-- Rate Limit Warning -->
+                <div id="rateLimitWarning" class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4 hidden slide-down">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-amber-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        <p class="text-sm text-amber-800">
+                            Too many attempts. Please wait <span id="countdown" class="font-bold"></span>s
+                        </p>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Success Message -->
+            <div id="successMessage" class="mt-4 bg-emerald-50 border border-emerald-200 rounded-xl p-4 hidden slide-down">
+                <div class="flex items-center gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-emerald-800">Account created successfully!</p>
+                        <p class="text-xs text-emerald-600 mt-0.5">Welcome aboard 🎉</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sign In Link -->
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    Already have an account? 
+                    <a href="#" class="text-purple-600 hover:text-purple-700 font-semibold ml-1 transition">Sign in</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-6 text-center">
+            <div class="flex items-center justify-center gap-2 text-white text-xs">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                </svg>
+                <span>Secured with end-to-end encryption</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SECURITY_CONFIG = {
+            MAX_ATTEMPTS: 3,
+            LOCKOUT_TIME: 30000,
+            DEBOUNCE_DELAY: 500
+        };
+
+        let submissionAttempts = 0;
+        let isLocked = false;
+
+        function generateCSRFToken() {
+            return 'csrf_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+        }
+
+        document.getElementById('csrfToken').value = generateCSRFToken();
+
+        function sanitizeInput(input) {
+            const div = document.createElement('div');
+            div.textContent = input;
+            return div.innerHTML;
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function calculatePasswordStrength(password) {
+            const checks = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password) && /[a-z]/.test(password),
+                number: /\d/.test(password),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            };
+
+            const checkmarks = ['check1', 'check2', 'check3', 'check4'];
+            checkmarks.forEach((id, index) => {
+                const element = document.getElementById(id);
+                const passed = Object.values(checks)[index];
+                element.textContent = passed ? '✓' : '';
+                element.className = `w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold transition ${
+                    passed ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-400'
+                }`;
+            });
+
+            return { strength: Object.values(checks).filter(Boolean).length, checks };
+        }
+
+        function updatePasswordStrength(password) {
+            const { strength } = calculatePasswordStrength(password);
+            const meters = [1, 2, 3, 4].map(i => document.getElementById(`strength${i}`));
+            const strengthLabel = document.getElementById('strengthLabel');
+
+            meters.forEach(meter => meter.className = 'strength-bar flex-1 bg-gray-200');
+
+            const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-emerald-500'];
+            const labels = ['Weak', 'Fair', 'Good', 'Strong'];
+            const textColors = ['text-red-500', 'text-orange-500', 'text-yellow-500', 'text-emerald-500'];
+
+            for (let i = 0; i < strength; i++) {
+                meters[i].className = `strength-bar flex-1 ${colors[strength - 1]}`;
+            }
+
+            strengthLabel.textContent = strength > 0 ? labels[strength - 1] : 'Not set';
+            strengthLabel.className = strength > 0 ? `font-medium ${textColors[strength - 1]}` : 'font-medium text-gray-400';
+
+            return strength;
+        }
+
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>';
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
+            }
+        });
+
+        document.getElementById('password').addEventListener('input', function(e) {
+            updatePasswordStrength(e.target.value);
+        });
+
+        function validateForm() {
+            let isValid = true;
+            const errors = {};
+
+            const username = document.getElementById('username').value.trim();
+            if (!username) {
+                errors.username = 'Username is required';
+                isValid = false;
+            } else if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+                errors.username = 'Invalid username format';
+                isValid = false;
+            }
+
+            const email = document.getElementById('email').value.trim();
+            if (!email) {
+                errors.email = 'Email is required';
+                isValid = false;
+            } else if (!isValidEmail(email)) {
+                errors.email = 'Invalid email address';
+                isValid = false;
+            }
+
+            const password = document.getElementById('password').value;
+            const { checks } = calculatePasswordStrength(password);
+            if (!password) {
+                errors.password = 'Password is required';
+                isValid = false;
+            } else if (!Object.values(checks).every(check => check)) {
+                errors.password = 'Password must meet all requirements';
+                isValid = false;
+            }
+
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            if (!confirmPassword) {
+                errors.confirmPassword = 'Please confirm your password';
+                isValid = false;
+            } else if (password !== confirmPassword) {
+                errors.confirmPassword = 'Passwords do not match';
+                isValid = false;
+            }
+
+            if (!document.getElementById('terms').checked) {
+                errors.terms = 'Please accept the terms';
+                isValid = false;
+            }
+
+            ['username', 'email', 'password', 'confirmPassword', 'terms'].forEach(field => {
+                const errorElement = document.getElementById(`${field}Error`);
+                if (errors[field]) {
+                    errorElement.textContent = errors[field];
+                    errorElement.classList.remove('hidden');
+                } else {
+                    errorElement.classList.add('hidden');
+                }
+            });
+
+            return isValid;
+        }
+
+        function handleRateLimit() {
+            if (isLocked) return false;
+
+            submissionAttempts++;
+
+            if (submissionAttempts >= SECURITY_CONFIG.MAX_ATTEMPTS) {
+                isLocked = true;
+                const submitBtn = document.getElementById('submitBtn');
+                const rateLimitWarning = document.getElementById('rateLimitWarning');
+                
+                submitBtn.disabled = true;
+                rateLimitWarning.classList.remove('hidden');
+
+                let remainingTime = SECURITY_CONFIG.LOCKOUT_TIME / 1000;
+                const countdownElement = document.getElementById('countdown');
+                
+                const countdownInterval = setInterval(() => {
+                    remainingTime--;
+                    countdownElement.textContent = remainingTime;
+                    
+                    if (remainingTime <= 0) {
+                        clearInterval(countdownInterval);
+                        isLocked = false;
+                        submissionAttempts = 0;
+                        submitBtn.disabled = false;
+                        rateLimitWarning.classList.add('hidden');
+                    }
+                }, 1000);
+
+                return false;
+            }
+
+            return true;
+        }
+
+        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!handleRateLimit() || !validateForm()) return;
+
+            const formData = {
+                username: sanitizeInput(document.getElementById('username').value.trim()),
+                email: sanitizeInput(document.getElementById('email').value.trim()),
+                password: document.getElementById('password').value,
+                csrf_token: document.getElementById('csrfToken').value
+            };
+
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+            const spinner = document.getElementById('spinner');
+
+            submitBtn.disabled = true;
+            btnText.textContent = 'Creating...';
+            btnIcon.classList.add('hidden');
+            spinner.classList.remove('hidden');
+
+            setTimeout(() => {
+                document.getElementById('successMessage').classList.remove('hidden');
+                document.getElementById('registrationForm').reset();
+                
+                submitBtn.disabled = false;
+                btnText.textContent = 'Create Account';
+                btnIcon.classList.remove('hidden');
+                spinner.classList.add('hidden');
+
+                [1, 2, 3, 4].forEach(i => {
+                    document.getElementById(`strength${i}`).className = 'strength-bar flex-1 bg-gray-200';
+                    const check = document.getElementById(`check${i}`);
+                    check.textContent = '';
+                    check.className = 'w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center text-[10px]';
+                });
+                
+                document.getElementById('strengthLabel').textContent = 'Not set';
+                document.getElementById('strengthLabel').className = 'font-medium text-gray-400';
+
+                document.getElementById('csrfToken').value = generateCSRFToken();
+
+                setTimeout(() => {
+                    document.getElementById('successMessage').classList.add('hidden');
+                }, 5000);
+
+                console.log('Form submitted:', formData);
+            }, 2000);
+        });
+
+        ['username', 'email'].forEach(fieldId => {
+            document.getElementById(fieldId).addEventListener('blur', function() {
+                const errorElement = document.getElementById(`${fieldId}Error`);
+                
+                if (fieldId === 'username' && this.value) {
+                    if (!/^[a-zA-Z0-9_]{3,20}$/.test(this.value.trim())) {
+                        errorElement.textContent = 'Invalid username format';
+                        errorElement.classList.remove('hidden');
+                    } else {
+                        errorElement.classList.add('hidden');
+                    }
+                } else if (fieldId === 'email' && this.value) {
+                    if (!isValidEmail(this.value.trim())) {
+                        errorElement.textContent = 'Invalid email address';
+                        errorElement.classList.remove('hidden');
+                    } else {
+                        errorElement.classList.add('hidden');
+                    }
+                }
+            });
+        });
+
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const errorElement = document.getElementById('confirmPasswordError');
+
+            if (this.value && password !== this.value) {
+                errorElement.textContent = 'Passwords do not match';
+                errorElement.classList.remove('hidden');
+            } else {
+                errorElement.classList.add('hidden');
+            }
+        });
+        </script>
+    </body>
+</html>
